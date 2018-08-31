@@ -21,10 +21,9 @@ RUN echo "#!/bin/bash" > /tmp/inicio_servicios.sh
 RUN echo "/sbin/sshd -k start" >> /tmp/inicio_servicios.sh
 RUN chmod +x /tmp/inicio_servicios.sh
 WORKDIR /tmp
-RUN /bin/sh inicio_servicios.sh
 
 
 
 #Ports to expose (ssh) 
 EXPOSE 22 
-ENTRYPOINT ["/bin/sh inicio_servicios.sh";"/usr/bin/bash"]
+ENTRYPOINT ["/usr/bin/bash"]

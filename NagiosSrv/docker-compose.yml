@@ -2,17 +2,10 @@ version: '3'
 services:
 services:
   httpd:
-    image: httpd
+          image: pbordoyedrans/nagiossrv:latest
     networks:
       static-network:
-        ipv4_address: 172.20.0.1
+        ipv4_address: 172.17.0.2
     ports:
      - "80:8080"
      - "22:2222"
-networks:
-  static-network:
-    ipam:
-      config:
-        - subnet: 172.20.0.0/24
-          #docker-compose v3+ do not use ip_range
-          ip_range: 172.20.0.0/24  

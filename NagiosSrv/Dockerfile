@@ -91,11 +91,9 @@ RUN echo "/sbin/sshd -k start" >> /tmp/inicio_servicios.sh
 RUN echo "/etc/rc.d/init.d/nagios start" >> /tmp/inicio_servicios.sh
 RUN chmod +x /tmp/inicio_servicios.sh
 WORKDIR /tmp
-RUN sh inicio_servicios.sh
 
 #Publico puertos 80 y 22
 EXPOSE 22
 EXPOSE 80
 
 ENTRYPOINT ["/usr/bin/bash"]
-
