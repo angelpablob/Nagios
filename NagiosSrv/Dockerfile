@@ -80,10 +80,56 @@ RUN echo "       service_description             SSH" >> /usr/local/nagios/etc/s
 RUN echo "       check_command                   check_ssh" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "       notifications_enabled           0" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "}" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "define service {" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "    use                     local-service           ; Name of service template to use" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "    host_name               cliente" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "    service_description     HTTP" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "    check_command           check_http" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "    notifications_enabled   0" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "}" >> /usr/local/nagios/etc/servers/cliente.cfg
+
 #Permit check on nagios -> servers folder
 RUN sed -i '/etc\/servers/s/^#//g' /usr/local/nagios/etc/nagios.cfg
 
-#Inicio servicios nagios y apache
+##Postfix configuration and enabling Nashios to send alerts
+#Postfix config
+RUN mv /etc/postfix/main.cf /etc/postfix/main.cf.old
+RUN touch /etc/postfix/main.cf
+RUN echo "myhostname = localhost.edrans.com" > /etc/postfix/main.cf
+RUN echo "relayhost = [smtp.gmail.com]:587" >> /etc/postfix/main.cf
+RUN echo "smtp_use_tls = yes" >> /etc/postfix/main.cf
+RUN echo "smtp_sasl_auth_enable = yes" >> /etc/postfix/main.cf
+RUN echo "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" >> /etc/postfix/main.cf
+RUN echo "smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt" >> /etc/postfix/main.cf
+RUN echo "smtp_sasl_security_options = noanonymous" >> /etc/postfix/main.cf
+RUN echo "smtp_sasl_tls_security_options = noanonymous" >> /etc/postfix/main.cf
+#Hosts config
+RUN touch /etc/hosts.new
+RUN echo "127.0.0.1	localhost ip6-localhost ip6-loopback" >> /etc/hosts.new
+RUN  tail -n1 /etc/hosts >> /etc/hosts.new
+RUN mv /etc/hosts /etc/hosts.old
+RUN mv /etc/hosts.new /etc/hosts
+
+#Config SASL
+RUN touch /etc/postfix/sasl_passwd
+RUN echo "[smtp.gmail.com]:587 pbordoy@edrans.com:Ieth6ung" > /etc/postfix/sasl_passwd
+RUN postmap /etc/postfix/sasl_passwd
+RUN chown root:postfix /etc/postfix/sasl_passwd*
+RUN chmod 640 /etc/postfix/sasl_passwd*
+
+#Config resources
+RUN echo "$USER5$=pbordoy@edrans.com" >> /usr/local/nagios/etc/resource.cfg
+RUN echo "$USER7$=smtp.edrans.com:587" >> /usr/local/nagios/etc/resource.cfg
+RUN echo "$USER9$=pbordoy@edrans.com" >> /usr/local/nagios/etc/resource.cfg
+RUN echo "$USER10$=123456" >> /usr/local/nagios/etc/resource.cfg
+
+#Config Commands
+RUN sed -i 's|/bin/mail|/bin/mail -r $ADMINEMAIL$|' /usr/local/nagios/etc/objects/commands.cfg
+
+#Config Contacts
+RUN sed -i 's|nagios@localhost|pbordoy@edrans.com|' /usr/local/nagios/etc/objects/contacts.cfg
+
+#Init services script
 RUN touch /tmp/inicio_servicios.sh
 RUN echo "#!/bin/bash" > /tmp/inicio_servicios.sh
 RUN echo "/sbin/httpd -k start" >> /tmp/inicio_servicios.sh
@@ -92,7 +138,7 @@ RUN echo "/etc/rc.d/init.d/nagios start" >> /tmp/inicio_servicios.sh
 RUN chmod +x /tmp/inicio_servicios.sh
 WORKDIR /tmp
 
-#Publico puertos 80 y 22
+#Publish ports 80 and 22
 EXPOSE 22
 EXPOSE 80
 
