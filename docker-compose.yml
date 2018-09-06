@@ -1,0 +1,17 @@
+version: '3'
+services:
+  server:
+    build: ./NagiosSrv
+    ports:
+     - "8081:80"
+    command: 
+    - /tmp/inicio_servicios.sh
+  client:
+    build: ./Nagiosclient
+    ports:
+     - "8082:80"
+     - "2224:22"
+    volumes:
+     - ./Nagiosclient/index.html:/var/www/html/index.html
+    command: 
+    - /tmp/inicio_servicios.sh   

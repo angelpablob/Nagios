@@ -1,9 +1,8 @@
 from centos:7
 MAINTAINER Pablo Bordoy <pbordoy@edrans.com>
 
-
 #Descarga e Instalacion de packetes 
-RUN yum -y install httpd php gcc glibc glibc-common perl gd gd-devel zip make net-snmp openssl-devel xinetd unzip openssh-server wget epel-relase
+RUN yum -y install httpd php gcc glibc glibc-common perl gd gd-devel zip make net-snmp openssl-devel xinetd unzip openssh-server wget epel-relase postfix cyrus-sasl-plain mailx
 
 #Creacionde usuarios para nagios
 RUN useradd nagios
@@ -93,8 +92,10 @@ RUN sed -i '/etc\/servers/s/^#//g' /usr/local/nagios/etc/nagios.cfg
 
 ##Postfix configuration and enabling Nashios to send alerts
 #Postfix config
-RUN mv /etc/postfix/main.cf /etc/postfix/main.cf.old
-RUN touch /etc/postfix/main.cf
+WORKDIR /etc/postfix
+##COPY main.cf main.cf.old
+##RUN rm main.cf
+RUN touch main.cf
 RUN echo "myhostname = localhost.edrans.com" > /etc/postfix/main.cf
 RUN echo "relayhost = [smtp.gmail.com]:587" >> /etc/postfix/main.cf
 RUN echo "smtp_use_tls = yes" >> /etc/postfix/main.cf
@@ -103,12 +104,16 @@ RUN echo "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" >> /etc/postf
 RUN echo "smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt" >> /etc/postfix/main.cf
 RUN echo "smtp_sasl_security_options = noanonymous" >> /etc/postfix/main.cf
 RUN echo "smtp_sasl_tls_security_options = noanonymous" >> /etc/postfix/main.cf
+
 #Hosts config
-RUN touch /etc/hosts.new
-RUN echo "127.0.0.1	localhost ip6-localhost ip6-loopback" >> /etc/hosts.new
-RUN  tail -n1 /etc/hosts >> /etc/hosts.new
-RUN mv /etc/hosts /etc/hosts.old
-RUN mv /etc/hosts.new /etc/hosts
+RUN touch /tmp/hosts.config.sh
+RUN chmod +x /tmp/hosts.config.sh
+RUN echo '#!/bin/bash' > /tmp/hosts.config.sh
+RUN echo 'touch /etc/hosts.new' >> /tmp/hosts.config.sh
+RUN echo 'echo "127.0.0.1	localhost ip6-localhost ip6-loopback" >> /etc/hosts.new' >> /tmp/hosts.config.sh
+RUN echo ' tail -n1 /etc/hosts >> /etc/hosts.new' >> /tmp/hosts.config.sh
+RUN echo 'mv /etc/hosts /etc/hosts.old' >> /tmp/hosts.config.sh
+RUN echo 'mv /etc/hosts.new /etc/hosts' >> /tmp/hosts.config.sh
 
 #Config SASL
 RUN touch /etc/postfix/sasl_passwd
@@ -135,6 +140,8 @@ RUN echo "#!/bin/bash" > /tmp/inicio_servicios.sh
 RUN echo "/sbin/httpd -k start" >> /tmp/inicio_servicios.sh
 RUN echo "/sbin/sshd -k start" >> /tmp/inicio_servicios.sh
 RUN echo "/etc/rc.d/init.d/nagios start" >> /tmp/inicio_servicios.sh
+RUN echo "/sbin/postfix start" >> /tmp/inicio_servicios.sh
+RUN echo "ping localhost" >> /tmp/inicio_servicios.sh
 RUN chmod +x /tmp/inicio_servicios.sh
 WORKDIR /tmp
 
