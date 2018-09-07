@@ -4,8 +4,11 @@ services:
     build: ./NagiosSrv
     ports:
      - "8081:80"
+     - "2223:22"
     command: 
     - /tmp/inicio_servicios.sh
+    networks:
+    - nagios  
   client:
     build: ./Nagiosclient
     ports:
@@ -14,4 +17,9 @@ services:
     volumes:
      - ./Nagiosclient/index.html:/var/www/html/index.html
     command: 
-    - /tmp/inicio_servicios.sh   
+    - /tmp/inicio_servicios.sh
+    networks:
+    - nagios 
+networks:
+        nagios:
+         driver: bridge  

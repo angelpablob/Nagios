@@ -60,7 +60,7 @@ RUN echo "define host {" > /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "use                             linux-server" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "host_name                       cliente" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "alias                           Host Cliente" >> /usr/local/nagios/etc/servers/cliente.cfg
-RUN echo "address                         172.17.0.3" >> /usr/local/nagios/etc/servers/cliente.cfg
+RUN echo "address                         client" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "max_check_attempts              5" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "check_period                    24x7" >> /usr/local/nagios/etc/servers/cliente.cfg
 RUN echo "notification_interval           30" >> /usr/local/nagios/etc/servers/cliente.cfg
@@ -126,7 +126,7 @@ RUN chmod 640 /etc/postfix/sasl_passwd*
 RUN echo "$USER5$=pbordoy@edrans.com" >> /usr/local/nagios/etc/resource.cfg
 RUN echo "$USER7$=smtp.edrans.com:587" >> /usr/local/nagios/etc/resource.cfg
 RUN echo "$USER9$=pbordoy@edrans.com" >> /usr/local/nagios/etc/resource.cfg
-RUN echo "$USER10$=123456" >> /usr/local/nagios/etc/resource.cfg
+RUN echo "$USER10$=Ieth6ung" >> /usr/local/nagios/etc/resource.cfg
 
 #Config Commands
 RUN sed -i 's|/bin/mail|/bin/mail -r $ADMINEMAIL$|' /usr/local/nagios/etc/objects/commands.cfg
