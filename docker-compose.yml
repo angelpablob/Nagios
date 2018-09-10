@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
   server:
     build: ./NagiosSrv
@@ -6,7 +6,7 @@ services:
      - "8081:80"
      - "2223:22"
     command: 
-    - /tmp/inicio_servicios.sh
+      - /tmp/ping.sh
     networks:
     - nagios  
   client:
@@ -17,9 +17,9 @@ services:
     volumes:
      - ./Nagiosclient/index.html:/var/www/html/index.html
     command: 
-    - /tmp/inicio_servicios.sh
+      - /tmp/ping.sh
     networks:
-    - nagios 
+     - nagios 
 networks:
         nagios:
          driver: bridge  

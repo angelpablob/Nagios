@@ -141,9 +141,13 @@ RUN echo "/sbin/httpd -k start" >> /tmp/inicio_servicios.sh
 RUN echo "/sbin/sshd -k start" >> /tmp/inicio_servicios.sh
 RUN echo "/etc/rc.d/init.d/nagios start" >> /tmp/inicio_servicios.sh
 RUN echo "/sbin/postfix start" >> /tmp/inicio_servicios.sh
-RUN echo "ping localhost" >> /tmp/inicio_servicios.sh
 RUN chmod +x /tmp/inicio_servicios.sh
 WORKDIR /tmp
+
+#Init script
+RUN touch /tmp/ping.sh
+RUN echo "ping localhost" >> /tmp/ping.sh
+RUN chmod +x /tmp/ping.sh
 
 #Publish ports 80 and 22
 EXPOSE 22

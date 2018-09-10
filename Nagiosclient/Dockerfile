@@ -28,9 +28,14 @@ RUN echo "#!/bin/bash" > /tmp/inicio_servicios.sh
 RUN echo "/sbin/nrpe -c /etc/nagios/nrpe.cfg -d" >> /tmp/inicio_servicios.sh
 RUN echo "/sbin/httpd -k start" >> /tmp/inicio_servicios.sh
 RUN echo "/sbin/sshd -k start" >> /tmp/inicio_servicios.sh
-RUN echo "ping localhost" >> /tmp/inicio_servicios.sh
 RUN chmod +x /tmp/inicio_servicios.sh
 WORKDIR /tmp
+
+#Init script
+RUN touch /tmp/ping.sh
+RUN echo "ping localhost" >> /tmp/ping.sh
+RUN chmod +x /tmp/ping.sh
+
 
 #Ports to expose (ssh) 
 EXPOSE 22 
